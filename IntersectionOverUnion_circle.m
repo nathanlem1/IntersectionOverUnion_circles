@@ -65,27 +65,53 @@ end
 sprintf('detections_iou_total: %s', num2str(detections_iou_total));
 sprintf('groundTruth_iou_total: %s', num2str(groundTruth_iou_total));
 
+TP = detections_iou_total(find(detections_iou_total >= 0.5)) % True positive
+TP_num = length(TP)
+FP = detections_iou_total(find(detections_iou_total < 0.5)) % False positive
+FP_num = length(FP)
+FN = groundTruth_iou_total(find(groundTruth_iou_total < 0.5)) % False negative (miss-detections)
+FN_num = length(FN)
 
+Recall = TP_num/(TP_num + FN_num) % Recall or Sensitivity
+Precision = TP_num/(TP_num + FP_num) % Precision
+F1_score= 2*Precision*Recall/(Precision + Recall) % ..............This is a good measure.
 
+sprintf('TP_num: %s', num2str(TP_num))
+sprintf('FP_num: %s', num2str(FP_num))
+sprintf('FN_num: %s', num2str(FN_num))
+sprintf('Recall: %s', num2str(Recall))
+sprintf('Precision: %s', num2str(Precision))
+sprintf('F1_score: %s', num2str(F1_score))
 
+% Plot Success rate
+threshold_list = []
+Success_num_list = []
+for i = 0:0.001:1
+    threshold_i = i;
+    Success = detections_iou(find(detections_iou  >= threshold_i)); % True positive
+    Success_num = length(Success);
+    threshold_list = [threshold_list threshold_i];
+    Success_num_list = [Success_num_list Success_num];
+end
 
+Success_max = max(Success_num_list);
+Success_rate =  Success_num_list/Success_max;
+sprintf('threshold_list: %s', num2str(threshold_list));
+sprintf('Success_rate: %s', num2str(Success_rate));
 
+% Compute Area Under Curve (AUC)
+% auc = trapz(Success_rate, threshold_list, 0.001, axis== 0); % .........This is the most quantitative measure to be used!
+% auc = trapz(Success_rate, threshold_list, 0.001, axis== 0); % .........This is the most quantitative measure to be used!
+% print('Area under curve; ', auc)
 
+figure, plot(threshold_list,Success_rate)  % For visual viewing, from which AUC is computed
+ylabel('Success rate')
+xlabel('Overlapp threshold')
+legend('Overlap success plot');
 
-
-
-
-
-
-
-
-
-
-
-
- % This function computes overlap (intersection over union) of two circles
+% This function computes overlap (intersection over union) of two circles
     function overlapRatio = circle_intersection_over_union(circle1, circle2)   % Nested function
-   
+
         % The format of the circles is (either detection or ground truth) is [xc, yc, r]
         x1 = circle1(1);  y1 = circle1(2); r1 = circle1(3);
         x2 = circle2(1); y2 = circle2(2); r2 = circle2(3);
