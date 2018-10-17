@@ -51,7 +51,6 @@ for d = 1:size(groundtruth_total, 3) % for each frame d
           gt_circle = groundtruth_d(gt,:);
           iou = circle_intersection_over_union(det_circle, gt_circle);
           detection_groundtruth_iou(dt,gt) = iou;
-
        end 
     end
     sprintf('detection_groundtruth_iou: %s', num2str(detection_groundtruth_iou));
