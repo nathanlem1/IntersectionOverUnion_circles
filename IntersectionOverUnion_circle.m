@@ -25,8 +25,46 @@ groundtruth2 = [8, 8, 6; 16, 16, 8; 30, 30, 10];  % For frame 2
 detections2 = [10, 10, 6; 20, 20, 8; 16, 16, 10; 40, 30, 12];
 
 N_frames = 2;
+dim1_det = max(size(detections1,1), size(detections2,1));
+dim2_det = max(size(detections1,2), size(detections2,2));
 
-% TODO:
+dim1_gt = max(size(groundtruth1,1), size(groundtruth2,1));
+dim2_gt = max(size(groundtruth1,2), size(groundtruth2,2));
+
+groundtruth_total = zeros(dim1_gt,dim2_gt, N_frames); % combine all groundtruths of all frames, in this case 2 frames
+groundtruth_total(:,:,1) = groundtruth1;
+groundtruth_total(:,:,2) = groundtruth2;
+
+detections_total = zeros(dim1_det,dim2_det, N_frames); % combine all detections of all frames, in this case 2 frames
+detections_total(:,:,1) = detections1;
+detections_total(:,:,2) = detections2;
+
+detections_iou_total = [];
+groundTruth_iou_total = [];
+for d = 1:size(groundtruth_total, 3) % for each frame d
+    detections_d = detections_total(:,:,d);
+    groundtruth_d = groundtruth_total(:,:,d);
+    detection_groundtruth_iou = zeros(length(detections_d), length(groundtruth_d));
+    for gt = 1: length(groundtruth_d)
+       for dt = 1:length(detections_d)
+          det_circle = detections_d(dt,:);
+          gt_circle = groundtruth_d(gt,:);
+          iou = circle_intersection_over_union(det_circle, gt_circle);
+          detection_groundtruth_iou(dt,gt) = iou;
+
+       end 
+    end
+    sprintf('detection_groundtruth_iou: %s', num2str(detection_groundtruth_iou));
+    detections_iou = max(detection_groundtruth_iou,1);
+    groundTruth_iou = max(detection_groundtruth_iou,0);
+    sprintf('detections_iou: %s', num2str(detections_iou));
+    sprintf('groundtruth_iou: %s', num2str(groundTruth_iou));
+    detections_iou_total = [detections_iou_total detections_iou];
+    groundTruth_iou_total = [groundTruth_iou_total groundTruth_iou];
+end
+
+sprintf('detections_iou_total: %s', num2str(detections_iou_total));
+sprintf('groundTruth_iou_total: %s', num2str(groundTruth_iou_total));
 
 
 
