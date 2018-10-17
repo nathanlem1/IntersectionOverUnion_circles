@@ -1,4 +1,4 @@
-%% Intersection over union of circles
+%% Intersection over union (overlap ratio) of circles
 % This code computes overlap (intersection over union) of two circles, counts number of true positives, false positives and false negatives as well as 
 % it computes recall, precision, F1-score and area-under-curve (AUC). It also plots success rate at different overlap threshold ranging from 0 to 1. 
 % From this overlap success plot, we computed the AUC. The detection quality is measured using mainly AUC and also using F1-score (F-score or F-measure).
