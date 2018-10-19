@@ -67,7 +67,7 @@ groundTruth_iou_total = []
 for d in range(groundtruth_total.shape[0]): # for each frame d
     detections_d = detections_total[d]
     groundtruth_d = groundtruth_total[d]
-    detection_groundtruth_iou = np.zeros((len(detections_d), len(groundtruth_d)))
+    detection_groundtruth_iou = np.zeros((detections_d.shape[0], groundtruth_d.shape[0]))
     for gt in range(len(groundtruth_d)):
        for dt in range(len(detections_d)):
           det_circle = detections_d[dt]
