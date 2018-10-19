@@ -44,7 +44,7 @@ groundTruth_iou_total = [];
 for d = 1:size(groundtruth_total, 3) % for each frame d
     detections_d = detections_total(:,:,d);
     groundtruth_d = groundtruth_total(:,:,d);
-    detection_groundtruth_iou = zeros(length(detections_d), length(groundtruth_d));
+    detection_groundtruth_iou = zeros(size(detections_d,1), size(groundtruth_d,1));
     for gt = 1: length(groundtruth_d)
        for dt = 1:length(detections_d)
           det_circle = detections_d(dt,:);
@@ -53,39 +53,44 @@ for d = 1:size(groundtruth_total, 3) % for each frame d
           detection_groundtruth_iou(dt,gt) = iou;
        end 
     end
-    sprintf('detection_groundtruth_iou: %s', num2str(detection_groundtruth_iou));
-    detections_iou = max(detection_groundtruth_iou,1);
-    groundTruth_iou = max(detection_groundtruth_iou,0);
-    sprintf('detections_iou: %s', num2str(detections_iou));
-    sprintf('groundtruth_iou: %s', num2str(groundTruth_iou));
+    disp('detection_groundtruth_iou:');
+    disp(detection_groundtruth_iou)
+    detections_iou = max(detection_groundtruth_iou,[],2);
+    groundTruth_iou = max(detection_groundtruth_iou, [], 1);
+    disp('detections_iou: ');
+    disp(detections_iou);
+    disp('groundtruth_iou: ');
+    disp(groundTruth_iou);
     detections_iou_total = [detections_iou_total detections_iou];
     groundTruth_iou_total = [groundTruth_iou_total groundTruth_iou];
 end
 
-sprintf('detections_iou_total: %s', num2str(detections_iou_total));
-sprintf('groundTruth_iou_total: %s', num2str(groundTruth_iou_total));
+disp('detections_iou_total: ');
+disp(detections_iou_total);
+disp('groundTruth_iou_total: ');
+disp(groundTruth_iou_total);
 
-TP = detections_iou_total(find(detections_iou_total >= 0.5)) % True positive
-TP_num = length(TP)
-FP = detections_iou_total(find(detections_iou_total < 0.5)) % False positive
-FP_num = length(FP)
-FN = groundTruth_iou_total(find(groundTruth_iou_total < 0.5)) % False negative (miss-detections)
-FN_num = length(FN)
+TP = detections_iou_total(find(detections_iou_total >= 0.5)); % True positive
+TP_num = length(TP);
+FP = detections_iou_total(find(detections_iou_total < 0.5)); % False positive
+FP_num = length(FP);
+FN = groundTruth_iou_total(find(groundTruth_iou_total < 0.5)); % False negative (miss-detections)
+FN_num = length(FN);
 
-Recall = TP_num/(TP_num + FN_num) % Recall or Sensitivity
-Precision = TP_num/(TP_num + FP_num) % Precision
-F1_score= 2*Precision*Recall/(Precision + Recall) % ..............This is a good measure.
+Recall = TP_num/(TP_num + FN_num); % Recall or Sensitivity
+Precision = TP_num/(TP_num + FP_num); % Precision
+F1_score= 2*Precision*Recall/(Precision + Recall); % ..............This is a good measure.
 
-sprintf('TP_num: %s', num2str(TP_num))
-sprintf('FP_num: %s', num2str(FP_num))
-sprintf('FN_num: %s', num2str(FN_num))
-sprintf('Recall: %s', num2str(Recall))
-sprintf('Precision: %s', num2str(Precision))
-sprintf('F1_score: %s', num2str(F1_score))
+disp(['TP_num: ', num2str(TP_num)])
+disp(['FP_num: ', num2str(FP_num)])
+disp(['FN_num: ', num2str(FN_num)])
+disp(['Recall: ', num2str(Recall)])
+disp(['Precision: ', num2str(Precision)])
+disp(['F1_score: ', num2str(F1_score)])
 
 % Plot Success rate
-threshold_list = []
-Success_num_list = []
+threshold_list = [];
+Success_num_list = [];
 for i = 0:0.001:1
     threshold_i = i;
     Success = detections_iou(find(detections_iou  >= threshold_i)); % True positive
@@ -96,13 +101,12 @@ end
 
 Success_max = max(Success_num_list);
 Success_rate =  Success_num_list/Success_max;
-sprintf('threshold_list: %s', num2str(threshold_list));
-sprintf('Success_rate: %s', num2str(Success_rate));
+disp(['threshold_list: ', num2str(threshold_list)]);
+disp(['Success_rate: ', num2str(Success_rate)]);
 
 % Compute Area Under Curve (AUC)
-% auc = trapz(Success_rate, threshold_list, 0.001, axis== 0); % .........This is the most quantitative measure to be used!
-% auc = trapz(Success_rate, threshold_list, 0.001, axis== 0); % .........This is the most quantitative measure to be used!
-% print('Area under curve; ', auc)
+auc = trapz(threshold_list, Success_rate); % .........This is the most quantitative measure to be used!
+disp(['Area under curve; ', num2str(auc)])
 
 figure, plot(threshold_list,Success_rate)  % For visual viewing, from which AUC is computed
 ylabel('Success rate')
