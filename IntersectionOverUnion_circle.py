@@ -5,6 +5,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Git trial
+N = np.array([5, 6])
+#####
+
 # Computes overlap (intersection over union) of two circles
 def circle_intersection_over_union(circle1, circle2):
 
